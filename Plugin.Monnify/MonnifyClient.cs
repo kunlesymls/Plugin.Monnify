@@ -36,74 +36,13 @@ namespace Plugin.Monnify
             DefaultUrl = baseUrl;
         }
 
-        public MonnifyClient(string baseUrl, string apkiKey, string secrectKey) 
-        {
-            DefaultUrl = baseUrl;
-            ApiKey = apkiKey;
-            SecrectKey = secrectKey;
-            Client = BasicAuthentication();
-        }
-        public void ConfigureMonnifyClient(string apkiKey, string secrectKey)
-        {           
-            ApiKey = apkiKey;
-            SecrectKey = secrectKey;
-            Client = BasicAuthentication();
-        }
-
-        private async Task<T> PostUrlAndDeSerialze<T>(string url)
-        {
-            var result = await Client.PostAsync(url, new StringContent("", Encoding.UTF8, "application/json"));
-
-            // Read the result as string
-            var content = await result.Content.ReadAsStringAsync();
-
-            // De-Serialize content to match the object for return
-            return JsonConvert.DeserializeObject<T>(content);
-        }
-
-        private async Task<T> PostUrlAndDeSerialze<T, R>(string url, R r)
-        {
-            var result = await Client.PostAsync(url, new StringContent(JsonConvert.SerializeObject(r), Encoding.UTF8, "application/json"));
-
-            // Read the result as string
-            var content = await result.Content.ReadAsStringAsync();
-
-            // De-Serialize content to match the object for return
-            return JsonConvert.DeserializeObject<T>(content);
-        }
-
-        private async Task<T> PutUrlAndDeSerialze<T, R>(string url, R r)
-        {
-            var result = await Client.PutAsync(url, new StringContent(JsonConvert.SerializeObject(r), Encoding.UTF8, "application/json"));
-
-            // Read the result as string
-            var content = await result.Content.ReadAsStringAsync();
-
-            // De-Serialize content to match the object for return
-            return JsonConvert.DeserializeObject<T>(content);
-        }
-
-        private async Task<T> GetUrlAndDeSerialze<T>(string url)
-        {
-            var result = await Client.GetAsync(url);
-            var content = await result.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<T>(content);
-        }
-        private async Task<T> DeleteUrlAndDeSerialze<T>(string url)
-        {
-            var result = await Client.DeleteAsync(url);
-            var content = await result.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<T>(content);
-        }
-
-        public string ComputeTransactionHash(string paymentReference, string amountPaid, string paidOn, string transactionReference)
-        {
-            string hash_string = $"{SecrectKey}|{paymentReference}|{amountPaid}|{paidOn}|{transactionReference}";
-            System.Security.Cryptography.SHA512Managed sha512 = new System.Security.Cryptography.SHA512Managed();
-            byte[] EncryptedSHA512 = sha512.ComputeHash(Encoding.UTF8.GetBytes(hash_string));
-            sha512.Clear();
-            return BitConverter.ToString(EncryptedSHA512).Replace("-", "").ToLower();
-        }
+        //public MonnifyClient(string baseUrl, string apkiKey, string secrectKey) 
+        //{
+        //    DefaultUrl = baseUrl;
+        //    ApiKey = apkiKey;
+        //    SecrectKey = secrectKey;
+        //    Client = BasicAuthentication();
+        //}
 
         /// <summary>
         /// Basic authentication is a simple authentication scheme built into the HTTP protocol. 
@@ -127,14 +66,85 @@ namespace Plugin.Monnify
         /// To get a bearer token, call the login endpoint with your basic authorization header and an access token will be returned.
         /// </summary>
         /// <returns>AuthenticationResponse</returns>
-        public async Task<AuthenticationResponse> GetBearerAccessToken()
+        public async Task<AuthenticationResponse> GetBearerAccessToken(string apkiKey, string secrectKey)
         {
+            ApiKey = apkiKey;
+            SecrectKey = secrectKey;
+
+            Client = BasicAuthentication();
+
             string url = $"{DefaultUrl}auth/login/";
+
             var response = await PostUrlAndDeSerialze<AuthenticationResponse>(url);
+
             Token = response.ResponseBody.accessToken;
-            TokenExpire = DateTime.Parse(response.ResponseBody.ExpiresIn);
+            //TokenExpire = DateTime.Parse(response.ResponseBody.ExpiresIn);
             return response;
         }
+
+        private async Task<T> PostUrlAndDeSerialze<T>(string url)
+        {
+            var result = await Client.PostAsync(url, new StringContent("", Encoding.Default, "application/json"));
+
+            // Read the result as string
+            var content = await result.Content.ReadAsStringAsync();
+
+            // De-Serialize content to match the object for return
+            return JsonConvert.DeserializeObject<T>(content);
+        }
+
+        private async Task<T> PostUrlAndDeSerialze<T, R>(string url, R r)
+        {
+            //Client.DefaultRequestHeaders.Remove("authorization");
+            Client.DefaultRequestHeaders.Add("authorization", $"Bearer {Token}");
+
+            var result = await Client.PostAsync(url, new StringContent(JsonConvert.SerializeObject(r), Encoding.Default, "application/json"));
+
+            // Read the result as string
+            var content = await result.Content.ReadAsStringAsync();
+
+            // De-Serialize content to match the object for return
+            return JsonConvert.DeserializeObject<T>(content);
+        }
+
+        private async Task<T> PutUrlAndDeSerialze<T, R>(string url, R r)
+        {
+            Client.DefaultRequestHeaders.TryAddWithoutValidation("authorization", $"Bearer {Token}");
+
+            var result = await Client.PutAsync(url, new StringContent(JsonConvert.SerializeObject(r), Encoding.Default, "application/json"));
+
+            // Read the result as string
+            var content = await result.Content.ReadAsStringAsync();
+
+            // De-Serialize content to match the object for return
+            return JsonConvert.DeserializeObject<T>(content);
+        }
+
+        private async Task<T> GetUrlAndDeSerialze<T>(string url)
+        {
+            Client.DefaultRequestHeaders.TryAddWithoutValidation("authorization", $"Bearer {Token}");
+
+            var result = await Client.GetAsync(url);
+            var content = await result.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<T>(content);
+        }
+        private async Task<T> DeleteUrlAndDeSerialze<T>(string url)
+        {
+            Client.DefaultRequestHeaders.TryAddWithoutValidation("authorization", $"Bearer {Token}");
+
+            var result = await Client.DeleteAsync(url);
+            var content = await result.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<T>(content);
+        }
+
+        public string ComputeTransactionHash(string paymentReference, string amountPaid, string paidOn, string transactionReference)
+        {
+            string hash_string = $"{SecrectKey}|{paymentReference}|{amountPaid}|{paidOn}|{transactionReference}";
+            System.Security.Cryptography.SHA512Managed sha512 = new System.Security.Cryptography.SHA512Managed();
+            byte[] EncryptedSHA512 = sha512.ComputeHash(Encoding.UTF8.GetBytes(hash_string));
+            sha512.Clear();
+            return BitConverter.ToString(EncryptedSHA512).Replace("-", "").ToLower();
+        }       
 
         public async Task<OneTimeTransactionResponse> InitiateOneTimeTransaction(OneTimeTransactionRequest request)
         {

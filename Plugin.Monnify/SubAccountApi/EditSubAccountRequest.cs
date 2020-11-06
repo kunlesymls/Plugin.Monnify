@@ -9,7 +9,7 @@ namespace Plugin.Monnify.SubAccountApi
         public string SubAccountCode { get; set; }
 
         [JsonProperty("currencyCode")]
-        public string CurrencyCode { get; set; }
+        public string CurrencyCode { get; set; } = "NGN";
 
         [JsonProperty("bankCode")]
         public string BankCode { get; set; }

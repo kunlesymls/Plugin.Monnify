@@ -15,8 +15,8 @@ namespace Plugin.Monnify
         HttpClient Client { get; set; }
         string Token { get; set; }
         DateTime TokenExpire { get; set; }
+        Task<AuthenticationResponse> GetBearerAccessToken(string apkiKey, string secrectKey);
 
-        void ConfigureMonnifyClient(string apkiKey, string secrectKey);
         Task<CreateLimitProfileResponse> AddLimitProfile(CreateLimitProfileRequest request);
         Task<CreateSubAccountResponse> AddSubAccount(CreateSubAccountRequest request);
         Task<SingleTransferResponse> AuthorizeBatchTransfer(AuthorizeTransferRequest request);
@@ -29,7 +29,6 @@ namespace Plugin.Monnify
         Task<EditSubAccountResponse> DeleteSubAccount(DeleteSubAccountRequest request);
         Task<AllInvoiceResponse> GetAllInvoices();
         Task<BatchTransactionResponse> GetAllSingleTransfer(int pageSize);
-        Task<AuthenticationResponse> GetBearerAccessToken();
         Task<BatchTransferDetailResponse> GetBulkTransfer(TransactionRequest request);
         Task<BulkTransferResponses> GetBulkTransfers(int pageSize);
         Task<BatchTransactionResponse> GetBulkTransferWithPaging(TransactionRequest request);

@@ -16,7 +16,7 @@ namespace Plugin.Monnify.InvoiceApi
         public string Amount { get; set; }
 
         [JsonProperty("currencyCode")]
-        public string CurrencyCode { get; set; }
+        public string CurrencyCode { get; set; } = "NGN";
 
         [JsonProperty("customerName")]
         public string CustomerName { get; set; }

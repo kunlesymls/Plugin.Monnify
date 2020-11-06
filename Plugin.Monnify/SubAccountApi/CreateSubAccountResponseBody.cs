@@ -15,7 +15,7 @@ namespace Plugin.Monnify.SubAccountApi
         public string AccountName { get; set; }
 
         [JsonProperty("currencyCode")]
-        public string CurrencyCode { get; set; }
+        public string CurrencyCode { get; set; } = "NGN";
 
         [JsonProperty("email")]
         public string Email { get; set; }

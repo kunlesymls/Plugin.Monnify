@@ -28,7 +28,7 @@ namespace Plugin.Monnify.ReserveAccountApi
         /// Currency Code for reserved account. Value should be NGN
         /// </summary>
         [JsonProperty("currencyCode")]
-        public string CurrencyCode { get; set; }
+        public string CurrencyCode { get; set; } = "NGN";
 
         /// <summary>
         /// *Required*

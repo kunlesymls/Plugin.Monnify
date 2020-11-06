@@ -33,7 +33,7 @@ namespace Plugin.Monnify.ReserveAccountApi
         public int Fee { get; set; }
 
         [JsonProperty("currencyCode")]
-        public string CurrencyCode { get; set; }
+        public string CurrencyCode { get; set; } = "NGN";
 
         [JsonProperty("completedOn")]
         public DateTime CompletedOn { get; set; }

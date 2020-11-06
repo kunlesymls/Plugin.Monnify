@@ -36,7 +36,7 @@ namespace Plugin.Monnify.InvoiceApi
         /// *Required* Currency Code for reserved account. Value should be NGN
         /// </summary>
         [JsonProperty("currencyCode")]
-        public string CurrencyCode { get; set; }
+        public string CurrencyCode { get; set; } = "NGN";
 
         /// <summary>
         /// *Required* Contract Code, check your Monnify dashboard on the settings page.
