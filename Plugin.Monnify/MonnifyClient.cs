@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Plugin.Monnify
 {
-    public class MonnifyConnect
+    public class MonnifyClient : IMonnifyClient
     {
         private string DefaultUrl { get; set; }
         private string ApiKey { get; set; }
@@ -22,12 +22,31 @@ namespace Plugin.Monnify
         public string Token { get; set; }
         public DateTime TokenExpire { get; set; }
         public HttpClient Client { get; set; }
-        public MonnifyConnect(string apkiKey, string secrectKey, string baseUrl)
+
+        //public MonnifyClient(string apkiKey, string secrectKey, string baseUrl)
+        //{
+        //    DefaultUrl = baseUrl;
+        //    ApiKey = apkiKey;
+        //    SecrectKey = secrectKey;
+
+        //    Client = BasicAuthentication();
+        //}
+        public MonnifyClient(string baseUrl)
+        {
+            DefaultUrl = baseUrl;
+        }
+
+        public MonnifyClient(string baseUrl, string apkiKey, string secrectKey) 
         {
             DefaultUrl = baseUrl;
             ApiKey = apkiKey;
             SecrectKey = secrectKey;
-
+            Client = BasicAuthentication();
+        }
+        public void ConfigureMonnifyClient(string apkiKey, string secrectKey)
+        {           
+            ApiKey = apkiKey;
+            SecrectKey = secrectKey;
             Client = BasicAuthentication();
         }
 
