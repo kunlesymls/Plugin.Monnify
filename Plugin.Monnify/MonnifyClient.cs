@@ -32,11 +32,11 @@ namespace Plugin.Monnify
             DefaultUrl = baseUrl;
         }
 
-        public MonnifyClient(string baseUrl, string apkiKey, string secrectKey, string contractCode)
+        public MonnifyClient(string baseUrl, string apiKey, string secretKey, string contractCode)
         {
             DefaultUrl = baseUrl;
-            ApiKey = apkiKey;
-            SecrectKey = secrectKey;
+            ApiKey = apiKey;
+            SecrectKey = secretKey;
             ContractCode = contractCode;
             Client = BasicAuthentication();
 
