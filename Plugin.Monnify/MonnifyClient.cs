@@ -19,9 +19,12 @@ namespace Plugin.Monnify
         private string DefaultUrl { get; set; }
         private string ApiKey { get; set; }
         private string SecrectKey { get; set; }
+        public string ContractCode { get; set; }
         public string Token { get; set; }
         public DateTime TokenExpire { get; set; }
         public HttpClient Client { get; set; }
+
+        private bool _isAuthenticated = false;
 
         //public MonnifyClient(string apkiKey, string secrectKey, string baseUrl)
         //{
@@ -36,13 +39,23 @@ namespace Plugin.Monnify
             DefaultUrl = baseUrl;
         }
 
-        //public MonnifyClient(string baseUrl, string apkiKey, string secrectKey) 
-        //{
-        //    DefaultUrl = baseUrl;
-        //    ApiKey = apkiKey;
-        //    SecrectKey = secrectKey;
-        //    Client = BasicAuthentication();
-        //}
+        public MonnifyClient(string baseUrl, string apkiKey, string secrectKey, string contractCode)
+        {
+            DefaultUrl = baseUrl;
+            ApiKey = apkiKey;
+            SecrectKey = secrectKey;
+            ContractCode = contractCode;
+            Client = BasicAuthentication();
+        } 
+        
+        public MonnifyClient(MonnifySetting monnifySetting)
+        {
+            DefaultUrl = monnifySetting.BaseUrl;
+            ApiKey = monnifySetting.ApiKey;
+            SecrectKey = monnifySetting.SecretKey;
+            ContractCode = monnifySetting.ContractCode;
+            Client = BasicAuthentication();
+        }
 
         /// <summary>
         /// Basic authentication is a simple authentication scheme built into the HTTP protocol. 
@@ -58,6 +71,8 @@ namespace Plugin.Monnify
             };
             _client.DefaultRequestHeaders.Accept.Clear();
             _client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            _isAuthenticated = true;
             return _client;
         }
 
@@ -71,7 +86,8 @@ namespace Plugin.Monnify
             ApiKey = apkiKey;
             SecrectKey = secrectKey;
 
-            Client = BasicAuthentication();
+            if(!_isAuthenticated)
+                Client = BasicAuthentication();
 
             string url = $"{DefaultUrl}auth/login/";
 
@@ -93,10 +109,13 @@ namespace Plugin.Monnify
             return JsonConvert.DeserializeObject<T>(content);
         }
 
-        private async Task<T> PostUrlAndDeSerialze<T, R>(string url, R r)
+        private async Task<T> PostUrlAndDeSerialze<T, R>(string url, R r, bool isBearerAuth = false)
         {
-            //Client.DefaultRequestHeaders.Remove("authorization");
-            Client.DefaultRequestHeaders.Add("authorization", $"Bearer {Token}");
+            if (isBearerAuth)
+            {
+                Client.DefaultRequestHeaders.Remove("authorization");
+                Client.DefaultRequestHeaders.Add("authorization", $"Bearer {Token}");
+            }           
 
             var result = await Client.PostAsync(url, new StringContent(JsonConvert.SerializeObject(r), Encoding.Default, "application/json"));
 
@@ -107,9 +126,13 @@ namespace Plugin.Monnify
             return JsonConvert.DeserializeObject<T>(content);
         }
 
-        private async Task<T> PutUrlAndDeSerialze<T, R>(string url, R r)
+        private async Task<T> PutUrlAndDeSerialze<T, R>(string url, R r, bool isBearerAuth = false)
         {
-            Client.DefaultRequestHeaders.TryAddWithoutValidation("authorization", $"Bearer {Token}");
+            if (isBearerAuth)
+            {
+                Client.DefaultRequestHeaders.Remove("authorization");
+                Client.DefaultRequestHeaders.Add("authorization", $"Bearer {Token}");
+            }
 
             var result = await Client.PutAsync(url, new StringContent(JsonConvert.SerializeObject(r), Encoding.Default, "application/json"));
 
@@ -120,17 +143,25 @@ namespace Plugin.Monnify
             return JsonConvert.DeserializeObject<T>(content);
         }
 
-        private async Task<T> GetUrlAndDeSerialze<T>(string url)
+        private async Task<T> GetUrlAndDeSerialze<T>(string url, bool isBearerAuth = false)
         {
-            Client.DefaultRequestHeaders.TryAddWithoutValidation("authorization", $"Bearer {Token}");
+            if (isBearerAuth)
+            {
+                Client.DefaultRequestHeaders.Remove("authorization");
+                Client.DefaultRequestHeaders.Add("authorization", $"Bearer {Token}");
+            }         
 
             var result = await Client.GetAsync(url);
             var content = await result.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<T>(content);
         }
-        private async Task<T> DeleteUrlAndDeSerialze<T>(string url)
+        private async Task<T> DeleteUrlAndDeSerialze<T>(string url, bool isBearerAuth = false)
         {
-            Client.DefaultRequestHeaders.TryAddWithoutValidation("authorization", $"Bearer {Token}");
+            if (isBearerAuth)
+            {
+                Client.DefaultRequestHeaders.Remove("authorization");
+                Client.DefaultRequestHeaders.Add("authorization", $"Bearer {Token}");
+            }
 
             var result = await Client.DeleteAsync(url);
             var content = await result.Content.ReadAsStringAsync();
@@ -229,7 +260,7 @@ namespace Plugin.Monnify
         public async Task<CreateReserveAccountResponse> CreateInvoiceReserveAccount(CreateInvoiceReserveAccountRequest request)
         {
             string url = $"{DefaultUrl}bank-transfer/reserved-accounts/";
-            return await PostUrlAndDeSerialze<CreateReserveAccountResponse, CreateInvoiceReserveAccountRequest>(url, request);
+            return await PostUrlAndDeSerialze<CreateReserveAccountResponse, CreateInvoiceReserveAccountRequest>(url, request, true);
         }
 
         /// <summary>
@@ -242,7 +273,7 @@ namespace Plugin.Monnify
         public async Task<CreateReserveAccountResponse> ReserveAccount(CreateReserveAccountRequest request)
         {
             string url = $"{DefaultUrl}bank-transfer/reserved-accounts";
-            return await PostUrlAndDeSerialze<CreateReserveAccountResponse, CreateReserveAccountRequest>(url, request);
+            return await PostUrlAndDeSerialze<CreateReserveAccountResponse, CreateReserveAccountRequest>(url, request, true);
         }
 
 
@@ -256,7 +287,7 @@ namespace Plugin.Monnify
         public async Task<GetReserveAccountTransactionResponse> ReserveAccountTransctions(GetReserveAccountTransactionRequest request)
         {
             string url = $"{DefaultUrl}bank-transfer/reserved-accounts/transactions?accountReference={request.AccountReference}&page={request.Page}&size={request.Size}";
-            return await GetUrlAndDeSerialze<GetReserveAccountTransactionResponse>(url);
+            return await GetUrlAndDeSerialze<GetReserveAccountTransactionResponse>(url, true);
         }
 
 
@@ -270,7 +301,7 @@ namespace Plugin.Monnify
         public async Task<GetReserveAccountResponse> GetReserveAccountDetail(ReserveAccountRequest request)
         {
             string url = $"{DefaultUrl}bank-transfer/reserved-accounts/{request.AccountReference}";
-            return await GetUrlAndDeSerialze<GetReserveAccountResponse>(url);
+            return await GetUrlAndDeSerialze<GetReserveAccountResponse>(url, true);
         }
 
         /// <summary>
@@ -283,7 +314,7 @@ namespace Plugin.Monnify
         public async Task<DeleteReserveAccountResponse> DeleteReserveAccount(ReserveAccountRequest request)
         {
             string url = $"{DefaultUrl}bank-transfer/reserved-accounts/{request.AccountReference}";
-            return await DeleteUrlAndDeSerialze<DeleteReserveAccountResponse>(url);
+            return await DeleteUrlAndDeSerialze<DeleteReserveAccountResponse>(url, true);
         }
 
 
@@ -362,7 +393,7 @@ namespace Plugin.Monnify
         public async Task<CreateLimitProfileResponses> GetLimitProfiles()
         {
             string url = $"{DefaultUrl}limit-profile/";
-            return await GetUrlAndDeSerialze<CreateLimitProfileResponses>(url);
+            return await GetUrlAndDeSerialze<CreateLimitProfileResponses>(url, true);
         }
 
         /// <summary>
@@ -374,7 +405,7 @@ namespace Plugin.Monnify
         public async Task<CreateLimitProfileResponse> UpdateLimitProfile(CreateLimitProfileRequest request)
         {
             string url = $"{DefaultUrl}sub-accounts";
-            return await PutUrlAndDeSerialze<CreateLimitProfileResponse, CreateLimitProfileRequest>(url, request);
+            return await PutUrlAndDeSerialze<CreateLimitProfileResponse, CreateLimitProfileRequest>(url, request, true);
         }
 
         /// <summary>
@@ -387,7 +418,7 @@ namespace Plugin.Monnify
         public async Task<ReserveAccountWithLimitResponse> ReserveAccountWithLimit(ReserveAccountWithLimitRequest request)
         {
             string url = $"{DefaultUrl}bank-transfer/reserved-accounts/";
-            return await PostUrlAndDeSerialze<ReserveAccountWithLimitResponse, ReserveAccountWithLimitRequest>(url, request);
+            return await PostUrlAndDeSerialze<ReserveAccountWithLimitResponse, ReserveAccountWithLimitRequest>(url, request, true);
         }
         /// <summary>
         /// Update Account with Profile Limit
@@ -399,7 +430,7 @@ namespace Plugin.Monnify
         public async Task<ReserveAccountWithLimitResponse> UpdateReserveAccountWithLimit(UpdateReserveAccountWithLimitRequest request)
         {
             string url = $"{DefaultUrl}bank-transfer/reserved-accounts/";
-            return await PostUrlAndDeSerialze<ReserveAccountWithLimitResponse, UpdateReserveAccountWithLimitRequest>(url, request);
+            return await PostUrlAndDeSerialze<ReserveAccountWithLimitResponse, UpdateReserveAccountWithLimitRequest>(url, request, true);
         }
 
         /// <summary>

@@ -13,7 +13,11 @@ namespace Plugin.Monnify
     public interface IMonnifyClient
     {
         HttpClient Client { get; set; }
+        string ContractCode { get; set; }
         string Token { get; set; }
+        //string ApiKey { get; set; }
+        //string SecrectKey { get; set; }
+        //string ContractCode { get; set; }
         DateTime TokenExpire { get; set; }
         Task<AuthenticationResponse> GetBearerAccessToken(string apkiKey, string secrectKey);
 

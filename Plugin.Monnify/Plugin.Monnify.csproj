@@ -2,10 +2,41 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Description>We've grouped the Monnify API Docs to help you easily find exactly what you need and guide you through the process of integration. Simply go through the use cases with this link to the github repo.
+https://github.com/kunlesymls/Plugin.Monnify.Demo</Description>
+    <PackageIcon>icon.png</PackageIcon>
+    <RepositoryUrl>https://github.com/kunlesymls/Plugin.Monnify</RepositoryUrl>
+    <RepositoryType>public</RepositoryType>
+    <PackageTags>monnify teamapt monnifyplugin kunlesymls josephajileye</PackageTags>
+    <PackageReleaseNotes>The is the initial release version
+Example at https://github.com/kunlesymls/Plugin.Monnify.Demo</PackageReleaseNotes>
+    <Authors>Joseph Ajileye</Authors>
+    <Product>Monnify Plugin Library</Product>
+    <Copyright>2020</Copyright>
+    <PackageProjectUrl>https://github.com/kunlesymls/Plugin.Monnify</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="icon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="icon.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
