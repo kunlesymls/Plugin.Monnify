@@ -25,15 +25,6 @@ namespace Plugin.Monnify
         public HttpClient Client { get; set; }
 
         private bool _isAuthenticated = false;
-
-        //public MonnifyClient(string apkiKey, string secrectKey, string baseUrl)
-        //{
-        //    DefaultUrl = baseUrl;
-        //    ApiKey = apkiKey;
-        //    SecrectKey = secrectKey;
-
-        //    Client = BasicAuthentication();
-        //}
         public MonnifyClient(string baseUrl)
         {
             DefaultUrl = baseUrl;
