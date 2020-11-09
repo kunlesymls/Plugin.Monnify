@@ -42,7 +42,7 @@ namespace Plugin.Monnify.InvoiceApi
         /// A description of the transaction. Will be used as account name for pay with transfer
         /// </summary>
         [JsonProperty("paymentDescription")]
-        public string paymentDescription { get; set; }
+        public string PaymentDescription { get; set; }
 
         /// <summary>
         /// *Required* Currency Code for the transaction. Value should be NGN

@@ -25,6 +25,8 @@ namespace Plugin.Monnify
         public HttpClient Client { get; set; }
 
         private bool _isAuthenticated = false;
+
+        [Obsolete]
         public MonnifyClient(string baseUrl)
         {
             DefaultUrl = baseUrl;
@@ -37,6 +39,7 @@ namespace Plugin.Monnify
             SecrectKey = secrectKey;
             ContractCode = contractCode;
             Client = BasicAuthentication();
+
         } 
         
         public MonnifyClient(MonnifySetting monnifySetting)
@@ -67,10 +70,32 @@ namespace Plugin.Monnify
             return _client;
         }
 
+
         /// <summary>
         /// Some endpoints require a bearer token for authorization. 
         /// To get a bearer token, call the login endpoint with your basic authorization header and an access token will be returned.
         /// </summary>
+        /// <returns>AuthenticationResponse</returns>
+        public async Task<AuthenticationResponse> GetBearerAccessToken()
+        {
+            if (!_isAuthenticated)
+                Client = BasicAuthentication();
+
+            string url = $"{DefaultUrl}auth/login/";
+
+            var response = await PostUrlAndDeSerialze<AuthenticationResponse>(url);
+
+            Token = response.ResponseBody.accessToken;
+            //TokenExpire = DateTime.Parse(response.ResponseBody.ExpiresIn);
+            return response;
+        }
+
+        /// <summary>
+        /// Some endpoints require a bearer token for authorization. 
+        /// To get a bearer token, call the login endpoint with your basic authorization header and an access token will be returned.
+        /// </summary>
+        /// <param name="apkiKey"></param>
+        /// <param name="secrectKey"></param>
         /// <returns>AuthenticationResponse</returns>
         public async Task<AuthenticationResponse> GetBearerAccessToken(string apkiKey, string secrectKey)
         {
