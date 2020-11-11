@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Description>
       We've grouped the Monnify API Docs to help you easily find exactly what you need and guide you through the process of integration. Simply go through the use cases with this link to the github repo.
@@ -21,7 +21,7 @@
     <Product>Monnify Plugin Library</Product>
     <Copyright>2020</Copyright>
     <PackageProjectUrl>https://github.com/kunlesymls/Plugin.Monnify</PackageProjectUrl>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
   </PropertyGroup>
 
   <ItemGroup>

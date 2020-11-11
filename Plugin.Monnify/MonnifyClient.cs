@@ -16,7 +16,9 @@ namespace Plugin.Monnify
 {
     public class MonnifyClient : IMonnifyClient
     {
+        private string BaseUrl { get; set; }
         private string DefaultUrl { get; set; }
+        private string DefaultUrlV2 { get; set; }
         private string ApiKey { get; set; }
         private string SecrectKey { get; set; }
         public string ContractCode { get; set; }
@@ -29,12 +31,16 @@ namespace Plugin.Monnify
         [Obsolete]
         public MonnifyClient(string baseUrl)
         {
-            DefaultUrl = baseUrl;
+            BaseUrl = baseUrl;
+            DefaultUrl = $"{BaseUrl}api/v1/";
+            DefaultUrlV2 = $"{BaseUrl}api/v2/";
         }
 
         public MonnifyClient(string baseUrl, string apiKey, string secretKey, string contractCode)
         {
-            DefaultUrl = baseUrl;
+            BaseUrl = baseUrl;
+            DefaultUrl = $"{BaseUrl}api/v1/";
+            DefaultUrlV2 = $"{BaseUrl}api/v2/";
             ApiKey = apiKey;
             SecrectKey = secretKey;
             ContractCode = contractCode;
@@ -44,7 +50,9 @@ namespace Plugin.Monnify
         
         public MonnifyClient(MonnifySetting monnifySetting)
         {
-            DefaultUrl = monnifySetting.BaseUrl;
+            BaseUrl = monnifySetting.BaseUrl;
+            DefaultUrl = $"{BaseUrl}api/v1/";
+            DefaultUrlV2 = $"{BaseUrl}api/v2/";
             ApiKey = monnifySetting.ApiKey;
             SecrectKey = monnifySetting.SecretKey;
             ContractCode = monnifySetting.ContractCode;
@@ -249,6 +257,7 @@ namespace Plugin.Monnify
         /// </summary>
         /// <param name="request"></param>
         /// <returns>TransactionStatusResponse</returns>
+        [Obsolete]
         public async Task<TransactionStatusResponse> VerifyTransactionByPaymentReference(TransactionStatusRequest request)
         {
             string url = $"{DefaultUrl}merchant/transactions/query?paymentReference={request.PaymentReference}";
@@ -262,8 +271,8 @@ namespace Plugin.Monnify
         /// <returns>TransactionStatusResponse</returns>
         public async Task<TransactionStatusResponse> VerifyTransactionByTransactionReference(TransactionStatusRequest request)
         {
-            string url = $"{DefaultUrl}merchant/transactions/query?transactionReference={request.TransactionReference}";
-            return await GetUrlAndDeSerialze<TransactionStatusResponse>(url);
+            string url = $"{DefaultUrlV2}transactions/{request.TransactionReference}";
+            return await GetUrlAndDeSerialze<TransactionStatusResponse>(url, true);
         }
 
         /// <summary>

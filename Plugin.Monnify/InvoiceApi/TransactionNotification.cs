@@ -18,6 +18,9 @@ namespace Plugin.Monnify.InvoiceApi
         [JsonProperty("totalPayable")]
         public string TotalPayable { get; set; }
 
+        [JsonProperty("settlementAmount")]
+        public string SettlementAmount { get; set; }
+
         [JsonProperty("paidOn")]
         public string PaidOn { get; set; }
 
