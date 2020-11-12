@@ -45,7 +45,6 @@ namespace Plugin.Monnify
             SecrectKey = secretKey;
             ContractCode = contractCode;
             Client = BasicAuthentication();
-
         } 
         
         public MonnifyClient(MonnifySetting monnifySetting)
